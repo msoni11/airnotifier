@@ -132,7 +132,8 @@ class PushHandler(APIBaseHandler):
                     response = gcm.process(token=[self.token], alert=data['alert'], extra=data['extra'], gcm=data['gcm'])
                     responsedata = response.json()
                     if responsedata['failure'] == 0:
-                        self.send_response(ACCEPTED)
+                        # custom indepth - sent response data for android devices
+                        self.send_response(ACCEPTED, data=responsedata)
                 except GCMUpdateRegIDsException as ex:
                     self.send_response(ACCEPTED)
                 except GCMInvalidRegistrationException as ex:
