@@ -69,6 +69,9 @@ class GCMClient(PushService):
         if collapse_key:
             payload['collapse_key'] = collapse_key
 
+        # custom indepth - setting priority to high to ensure notification always sent immediately
+        payload['priority'] = "high"
+
         return json.dumps(payload)
 
     def reverse_response_info(self, key, ids, results):
