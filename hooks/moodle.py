@@ -1,4 +1,5 @@
 import requests
+import random
 from api import API_PERMISSIONS
 
 HUBURL = "https://moodle.net/local/sitecheck/check.php"
@@ -23,7 +24,8 @@ def process_pushnotification_payload(data):
 		'title': title,
 		'site': site,
 		'userfrom': userfrom,
-		'notif': notif
+		'notif': notif,
+                'notId': random.randint(1, 1000000)
                 }
 	}
 
