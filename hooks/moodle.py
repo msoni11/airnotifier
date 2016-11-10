@@ -7,6 +7,7 @@ HUBURL = "https://moodle.net/local/sitecheck/check.php"
 def process_pushnotification_payload(data):
     extra = data.get('extra', {})
     userfrom = extra.get('userfromfullname', None)
+    usertoid = extra.get('usertoid', None)
     site = extra.get('site', None)
     timecreated = extra.get('timecreated', None)
     message = extra.get('smallmessage', None)
@@ -24,6 +25,7 @@ def process_pushnotification_payload(data):
 		'title': title,
 		'site': site,
 		'userfrom': userfrom,
+                'usertoid': usertoid,
 		'notif': notif,
                 'notId': random.randint(1, 1000000)
                 }
@@ -34,6 +36,7 @@ def process_pushnotification_payload(data):
                 'title': title,
                 'site': site,
                 'userfrom': userfrom,
+                'usertoid': usertoid,
 		'notif': notif
                 }
         }
