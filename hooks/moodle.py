@@ -13,6 +13,9 @@ def process_pushnotification_payload(data):
     message = extra.get('smallmessage', None)
     notif = extra.get('notification', None)
     title = extra.get('sitefullname', None)
+    courseid = extra.get('courseid', None)
+    notificationtype = extra.get('notificationtype', None)
+    moduleid = extra.get('moduleid', None)
 
     if not message:
 	message = extra.get('fullmessage', None)
@@ -21,25 +24,31 @@ def process_pushnotification_payload(data):
         title = 'Notification'
 
     data['gcm'] = {
-	'data': {
-		'title': title,
-		'site': site,
-		'userfrom': userfrom,
-                'usertoid': usertoid,
-		'notif': notif,
-                'notId': random.randint(1, 1000000)
-                }
-	}
+        'data': {
+            'title': title,
+            'site': site,
+            'userfrom': userfrom,
+            'usertoid': usertoid,
+            'notif': notif,
+            'notId': random.randint(1, 1000000),
+            'courseid': courseid,
+            'notificationtype': notificationtype,
+            'moduleid': moduleid
+        }
+    }
 
     data['apns'] = {
         'custom': {
-                'title': title,
-                'site': site,
-                'userfrom': userfrom,
-                'usertoid': usertoid,
-		'notif': notif
-                }
+            'title': title,
+            'site': site,
+            'userfrom': userfrom,
+            'usertoid': usertoid,
+            'notif': notif,
+            'courseid': courseid,
+            'notificationtype': notificationtype,
+            'moduleid': moduleid
         }
+    }
 
 
     if 'alert' not in data:
