@@ -17,17 +17,17 @@
     <table class="table table-bordered table-striped">
         <thead>
             <tr>
-                <th>{{ _('Device') }}</th>
-                <th>{{ _('Token/Registration ID') }}</th>
+                <th width="10%">{{ _('Device') }}</th>
+                <th width="70%">{{ _('Token/Registration ID') }}</th>
                 <th>{{ _('Delete') }}</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody style="overflow:scroll">
         {% for token in tokens %}
             <tr>
                 <td>{{ token['device'] }}</td>
-		<td><code title='{{ token['token'] }}'>{{ token['token'][:32] }}..</code></td>
-		<td>
+                <td><div style="overflow:auto"><code>{{ token['token'] }}</code></div></td>
+                <td>
                     <a class="btn btn-danger" href="/applications/{{app['shortname']}}/tokens?delete={{token['_id']}}"><i class="icon-trash icon-white"></i> {{ _('Delete') }}</a>
                 </td>
             </tr>
