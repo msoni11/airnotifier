@@ -35,25 +35,56 @@ class FCMClient(PushService):
         )
         self.endpoint = "%s/v1/projects/%s/messages:send" % (BASE_URL, self.project_id)
 
-    def build_request(self, token, alert, android=None, data=None, extra=None):
-        isDict = isinstance(alert, dict)
-        body = alert
-        title = alert
-        if isDict:
-            body = alert["body"]
-            title = alert["title"]
+    def format_values(self, data=None):
+        if not isinstance(data, dict):
+            return data
+
+        # Try to convert all fields to string.
+        formatted = {}
+
+        for (k, v) in data.iteritems():
+            if isinstance(v, bool):
+                formatted[k] = "1" if v else "0"
+
+            elif isinstance(v, dict):
+                try:
+                    formatted[k] = json.dumps(self.format_values(v))
+                except:
+                    _logger.error("Error treating field " + k)
+
+            elif v is not None:
+                formatted[k] = str(v)
+
+        return formatted
+
+    def build_request(self, token, alert, android=None, data=None, extra=None, apns=None):
+        if alert is not None and not isinstance(alert, dict):
+            alert = {
+                "body": alert,
+                "title": alert
+            }
 
         data["extra"] = extra
 
-        # data strcuture: https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
+        # data structure: https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
         payload = {
             "message": {
                 "token": token,
-                "notification": {"body": body, "title": title},
-                "android": android,
-                "data": data,
             }
         }
+
+        if alert:
+            payload["message"]["notification"] = self.format_values(alert)
+
+        if data:
+            payload["message"]["data"] = self.format_values(data)
+
+        if android:
+            payload["message"]["android"] = android
+
+        if apns:
+            payload["message"]["apns"] = apns
+
         return json.dumps(payload)
 
     def process(self, **kwargs):
@@ -61,6 +92,7 @@ class FCMClient(PushService):
         extra = kwargs.get("extra", {})
         alert = kwargs.get("alert", None)
         android = fcm_param.get("android", {})
+        apns = fcm_param.get("apns", {})
         data = fcm_param.get("data", {})
         appdb = kwargs.get("appdb", None)
         return self.send(
@@ -70,9 +102,10 @@ class FCMClient(PushService):
             android=android,
             extra=extra,
             data=data,
+            apns=apns
         )
 
-    def send(self, token, alert=None, data=None, appdb=None, android=None, extra=None):
+    def send(self, token, alert=None, data=None, appdb=None, android=None, extra=None, apns=None):
         """
         Send message to google gcm endpoint
         :param token: device token
@@ -88,7 +121,7 @@ class FCMClient(PushService):
             "Content-Type": "application/json; UTF-8",
         }
 
-        payload = self.build_request(token, alert, android, data, extra)
+        payload = self.build_request(token, alert, android, data, extra, apns)
         response = requests.post(self.endpoint, data=payload, headers=headers)
 
         if response.status_code >= 400:
