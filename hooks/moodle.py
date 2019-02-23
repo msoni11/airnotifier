@@ -24,6 +24,11 @@ def process_pushnotification_payload(data):
     if not title:
         title = "Notification"
 
+    # Set the correct device.
+    device = data.get('device', None).lower()
+    if device == "android-fcm" or device == "ios-fcm":
+        data["device"] = "fcm"
+
     data["gcm"] = {
         "data": {
             "title": title,
@@ -64,12 +69,6 @@ def process_pushnotification_payload(data):
 
     if not "fcm" in extra:
         data["extra"]["fcm"] = {"fcm-message": "this is fcm hook"}
-
-    if not "mpns" in extra:
-        data["extra"]["mpns"] = {"type": "toast", "text1": [data["alert"]]}
-
-    if not "gcm" in extra:
-        pass
 
     return data
 
