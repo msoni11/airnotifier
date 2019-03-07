@@ -182,7 +182,9 @@ class PushHandler(APIBaseHandler):
                         extra=requestPayload["extra"],
                         fcm=requestPayload["fcm"],
                     )
-                    self.send_response(ACCEPTED)
+                    # custom indepth - send back the response data
+                    responserequestPayload = response.json()
+                    self.send_response(ACCEPTED, data=responserequestPayload)
                 except FCMException as ex:
                     self.send_response(INTERNAL_SERVER_ERROR, dict(error=ex.error))
             elif device == DEVICE_TYPE_ANDROID:
@@ -198,7 +200,7 @@ class PushHandler(APIBaseHandler):
                     responserequestPayload = response.json()
                     if responserequestPayload["failure"] == 0:
                         # custom indepth - sent response data for android devices
-                        self.send_response(ACCEPTED, data=responsedata)
+                        self.send_response(ACCEPTED, data=responserequestPayload)
                 except GCMUpdateRegIDsException as ex:
                     self.send_response(ACCEPTED)
                 except GCMInvalidRegistrationException as ex:

@@ -28,6 +28,11 @@ def process_pushnotification_payload(data):
     device = data.get('device', None).lower()
     if device == "android-fcm" or device == "ios-fcm":
         data["device"] = "fcm"
+        # fcm only support string in data payload
+        if moduleid == False or moduleid is None:
+            moduleid = ''
+        if courseid == False or courseid is None:
+            courseid = ''
 
     data["gcm"] = {
         "data": {
@@ -56,6 +61,39 @@ def process_pushnotification_payload(data):
         }
     }
 
+    # Payload for the fcm notifications
+    data["fcm"] = {
+        "android": {
+            "data": {
+                "sound": "default",
+                "body": message,
+                "title": '',
+                "site": site,
+                "userfrom": userfrom,
+                "usertoid": usertoid,
+                "courseid": courseid,
+                "notificationtype": notificationtype,
+                "moduleid": moduleid
+            }
+        },
+        "apns": {
+            "payload": {
+                "aps": {
+                    "sound": "default",
+                    "alert": {
+                        "body": message,
+                        "title": '',
+                        "site": site,
+                        "userfrom": userfrom,
+                        "usertoid": usertoid,
+                        "courseid": courseid,
+                        "notificationtype": notificationtype,
+                        "moduleid": moduleid
+                    }
+                }
+            }
+        }
+    }
 
     if "alert" not in data:
         data["alert"] = message
